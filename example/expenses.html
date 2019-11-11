@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+  <script src="../src/js/d3/d3.v3.min.js"></script>
+  <script src="../src/js/d3/d3.chart.min.js"></script>
+  <script src="../src/js/d3/d3.chart.sankey.min.js"></script>
+  <script src="../src/js/d3/sankey.js"></script>
+  <style>
+    .node rect {
+      fill-opacity: .9;
+      shape-rendering: crispEdges;
+      stroke-width: 0;
+    }
+    .node text {
+      text-shadow: 0 1px 0 #fff;
+      opacity: 1
+    }
+    .link {
+      fill: none;
+      stroke: #000;
+      stroke-opacity: .3;
+    }
+    .link:hover {
+      stroke-opacity: .3;
+    }
+    div.tooltipsankeylink {
+      position: absolute;
+      text-align: center;
+      width: 300px;
+      height: 30px;
+      padding: 4px;
+      font: 13px sans-serif;
+      background: white;
+      border: 1px;
+      border-style: solid;
+      border-color: #000;
+      pointer-events: none;
+    }
+    div.tooltipsankeynode {
+      position: absolute;
+      text-align: center;
+      width: 150px;
+      height: 30px;
+      padding: 4px;
+      font: 13px sans-serif;
+      background: white;
+      border: 1px;
+      border-style: solid;
+      border-color: #000;
+      pointer-events: none;
+    }
+  </style>
+<body>
+  <div id='d3_sankey'></div>
+  <script>
+    var sankeyData = {
+      "nodes": [
+        {
+          "name": "Wallet A",
+          "id": "Wallet A"
+        },
+        {
+          "name": "Wallet B",
+          "id": "Wallet B"
+        },
+        {
+          "name": "Wallet C",
+          "id": "Wallet C"
+        },
+        {
+          "name": "Food",
+          "id": "Food"
+        },
+        {
+          "name": "Clothing",
+          "id": "Clothing"
+        },
+        {
+          "name": "Medical",
+          "id": "Medical"
+        },
+        {
+          "name": "Housing",
+          "id": "Housing"
+        },
+        {
+          "name": "Transportation",
+          "id": "Transportation"
+        },
+        {
+          "name": "Utility",
+          "id": "Utility"
+        },
+        {
+          "name": "Others",
+          "id": "Others"
+        },
+        {
+          "name": "Savings",
+          "id": "Savings"
+        },
+      ],
+      "links": [
+        {
+          "source": 0,
+          "target": 3,
+          "value": 250
+        },
+        {
+          "source": 0,
+          "target": 4,
+          "value": 50
+        },
+        {
+          "source": 0,
+          "target": 5,
+          "value": 50
+        },
+        {
+          "source": 0,
+          "target": 6,
+          "value": 350
+        },
+        {
+          "source": 0,
+          "target": 8,
+          "value": 200
+        },
+        {
+          "source": 0,
+          "target": 10,
+          "value": 100
+        },
+        {
+          "source": 1,
+          "target": 7,
+          "value": 200
+        },
+        {
+          "source": 1,
+          "target": 3,
+          "value": 100
+        },
+        {
+          "source": 1,
+          "target": 9,
+          "value": 200
+        },
+        {
+          "source": 1,
+          "target": 10,
+          "value": 200
+        },
+        {
+          "source": 2,
+          "target": 3,
+          "value": 200
+        },
+        {
+          "source": 2,
+          "target": 6,
+          "value": 200
+        },
+      ]
+    }
+
+    // get node IDs
+    var ids = [];
+    sankeyData.nodes.forEach(function(node) {
+      ids.push(node.id);
+    });
+
+    // generate random colors for sankey diagram
+    var random_colors = [];
+    for (var i = 0; i < 100; i++) {
+      random_colors.push(
+        '#'+((1<<24)*(Math.random()+1)|0).toString(16).substr(1)
+      );
+    }
+
+    // draw sankey diagram
+    var margin = {top: 30, right: 30, bottom: 70, left: 60},
+        width = 690 - margin.left - margin.right,
+        height = 690 - margin.top - margin.bottom;
+
+    var chart = d3.select("#d3_sankey")
+      .append("svg")
+      .attr("width", width + margin.left)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(0," + 10 + ")")
+      .chart("Sankey.Path");
+
+    chart
+      .name(label)
+      .colorNodes(function(name, node) {
+        return color(node, 1) || "#9999bb";
+      })
+      .colorLinks(function(link) {
+        return color(link.source, 4) || color(link.target, 1) || colors.fallback;
+      })
+      .nodeWidth(15)
+      .nodePadding(10)
+      .spread(true)
+      .iterations(0)
+      .draw(sankeyData);
+
+    function label(node) {
+      return node.name;
+    }
+
+    function color(node, depth) {
+      var id = node.id
+      if (random_colors[ids.indexOf(id)]) {
+        return random_colors[ids.indexOf(id)];
+      } else if (depth > 0 && node.targetLinks && node.targetLinks.length == 1) {
+        return color(node.targetLinks[0].source, depth-1);
+      } else {
+        return null;
+      }
+    }
+
+    // selecting all links, nodes, and rects
+    link = d3.select("#d3_sankey").select("svg").selectAll(".link");
+    node = d3.select("#d3_sankey").select("svg").selectAll(".node");
+    rect = d3.select("#d3_sankey").select("svg").selectAll("rect");
+
+    var div = d3.select("body").append("div")
+      .attr("class", "tooltipsankeylink")
+      .style("opacity", 0);
+
+    var div_node = d3.select("body").append("div")
+      .attr("class", "tooltipsankeynode")
+      .style("opacity", 0);
+
+    link.on("mouseover", function(d) {
+      // filter other links
+      link.filter(function(s) {return d.source.name == s.source.name && d.target.name == s.target.name}).transition()
+        .style("stroke-opacity", 0.7);
+      link.filter(function(s) {return d.source.name != s.source.name}).transition()
+        .style("stroke-opacity", 0.1);
+      link.filter(function(s) {return d.target.name != s.target.name}).transition()
+        .style("stroke-opacity", 0.1);
+
+      // filter nodes
+      node.selectAll("rect").transition()
+        .style("fill-opacity", 0.2);
+      node.selectAll("rect").filter(function(s) {return d.source.name == s.name}).transition()
+        .style("fill-opacity", 0.9);
+      node.selectAll("rect").filter(function(s) {return d.target.name == s.name}).transition()
+        .style("fill-opacity", 0.9);
+      node.selectAll("text").transition()
+        .style("opacity", 0.2);
+      node.selectAll("text").filter(function(s) {return d.source.name == s.name}).transition()
+        .style("opacity", 1);
+      node.selectAll("text").filter(function(s) {return d.target.name == s.name}).transition()
+        .style("opacity", 1);
+
+      // display labels
+      div.transition()
+        .duration(100)
+        .style("opacity", .9);
+      div .html("<b>" + d.source.name + "</b> → <b>"  + d.target.name + "</b><br/>" + (d.value))
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 28) + "px");
+      })
+
+    .on("mouseout", function(d) {
+      d3.select("#d3_sankey").select("svg").selectAll(".link").transition()
+      .style("stroke-opacity", 0.3);
+
+      node.selectAll("rect").transition()
+        .style("fill-opacity", 0.9);
+      node.selectAll("text").transition()
+        .style("opacity", 1);
+
+      div.transition()
+        .duration(100)
+        .style("opacity", 0);
+    });
+
+    node.on("mouseover", function(d) {
+      // filter links
+      link.transition()
+        .style("stroke-opacity", .05);
+      link.filter(function(s) {return d.name == s.source.name}).transition()
+        .style("stroke-opacity", 0.7);
+      link.filter(function(s) {return d.name == s.target.name}).transition()
+        .style("stroke-opacity", 0.7);
+
+      // filter nodes
+      node.selectAll("rect").transition()
+        .style("fill-opacity", 0.2);
+      node.selectAll("text").transition()
+        .style("opacity", 0.2);
+
+      var sources = link.filter(function(s) {return d.name == s.source.name});
+      var targets = [];
+      sources.filter(function(s) {targets.push(s.target.name)});
+
+      targets.forEach(function(target) {
+        node.selectAll("rect").filter(function(s) {return s.name == target}).transition()
+          .style("fill-opacity", 0.9);
+        node.selectAll("text").filter(function(s) {return s.name == target}).transition()
+          .style("opacity", 1);
+      });
+
+      var _targets = link.filter(function(s) {return d.name == s.target.name});
+      var _sources = [];
+      _targets.filter(function(s) {_sources.push(s.source.name)});
+
+      _sources.forEach(function(source) {
+        node.selectAll("rect").filter(function(s) {return s.name == source}).transition()
+          .style("fill-opacity", 0.9);
+        node.selectAll("text").filter(function(s) {return s.name == source}).transition()
+          .style("opacity", 1);
+      });
+
+      node.selectAll("rect").filter(function(s) {return s.name == d.name}).transition()
+        .style("fill-opacity", 0.9);
+      node.selectAll("text").filter(function(s) {return s.name == d.name}).transition()
+        .style("opacity", 1);
+
+      // display labels
+      div_node.transition()
+        .duration(100)
+        .style("opacity", .9);
+      div_node .html("<b>" + d.name + "</b><br/>" + (d.value))
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 28) + "px");
+    })
+
+    .on("mouseout", function(d) {
+      node.selectAll("rect").transition()
+        .style("fill-opacity", 0.9);
+      node.selectAll("text").transition()
+        .style("opacity", 1);
+      link.transition()
+        .style("stroke-opacity", 0.3);
+
+      div_node.transition()
+        .duration(100)
+        .style("opacity", 0);
+
+    });
+  </script>
+</body>
+</html>

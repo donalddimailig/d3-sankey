@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "name": "Wallet A",
+      "id": "Wallet A"
+    },
+    {
+      "name": "Wallet B",
+      "id": "Wallet B"
+    },
+    {
+      "name": "Wallet C",
+      "id": "Wallet C"
+    },
+    {
+      "name": "Food",
+      "id": "Food"
+    },
+    {
+      "name": "Clothing",
+      "id": "Clothing"
+    },
+    {
+      "name": "Medical",
+      "id": "Medical"
+    },
+    {
+      "name": "Housing",
+      "id": "Housing"
+    },
+    {
+      "name": "Transportation",
+      "id": "Transportation"
+    },
+    {
+      "name": "Utility",
+      "id": "Utility"
+    },
+    {
+      "name": "Others",
+      "id": "Others"
+    },
+    {
+      "name": "Savings",
+      "id": "Savings"
+    },
+  ],
+  "links": [
+    {
+      "source": 0,
+      "target": 3,
+      "value": 250
+    },
+    {
+      "source": 0,
+      "target": 4,
+      "value": 50
+    },
+    {
+      "source": 0,
+      "target": 5,
+      "value": 50
+    },
+    {
+      "source": 0,
+      "target": 6,
+      "value": 350
+    },
+    {
+      "source": 0,
+      "target": 8,
+      "value": 200
+    },
+    {
+      "source": 0,
+      "target": 10,
+      "value": 100
+    },
+    {
+      "source": 1,
+      "target": 7,
+      "value": 200
+    },
+    {
+      "source": 1,
+      "target": 3,
+      "value": 100
+    },
+    {
+      "source": 1,
+      "target": 9,
+      "value": 200
+    },
+    {
+      "source": 1,
+      "target": 10,
+      "value": 200
+    },
+    {
+      "source": 2,
+      "target": 3,
+      "value": 200
+    },
+    {
+      "source": 2,
+      "target": 6,
+      "value": 200
+    },
+  ]
+}
